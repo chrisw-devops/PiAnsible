@@ -1,0 +1,47 @@
+---
+
+- name: Add Docker GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker Repository
+  apt_repository:
+    #No 20.04 repo yet so have to use this one for the moment :'(
+    repo: deb https://download.docker.com/linux/ubuntu bionic stable
+    state: present
+
+- name: Install Docker community edition
+  apt:
+    name: docker-ce
+    state: present
+    force_apt_get: yes
+
+#Allow Docker
+- name: Install Docker Module for Python
+  pip:
+    name: docker
+
+- name: Add default user to the docker group
+  user:
+    name: "{{ common.default_user.username }}"
+    groups: docker
+    append: yes
+
+- name: Add dd-agent user to the docker group (when installed)
+  user:
+    name: dd-agent
+    groups: docker
+    append: yes
+
+- name: Start the Docker service and ensure it is started at boot
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Install Docker Compose
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.25.5/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: 0755

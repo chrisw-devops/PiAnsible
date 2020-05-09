@@ -1,0 +1,23 @@
+---
+
+- name: Create default user
+  user:
+    name: "{{ common.default_user.username }}"
+    shell: /bin/bash
+
+- name: Set authorized key for default user
+  authorized_key:
+    user: "{{ common.default_user.username }}"
+    state: present
+    key: "https://github.com/{{ common.default_user.github_user }}.keys"
+
+- name: Add default user to sudo group
+  user:
+    name: "{{ common.default_user.username }}"
+    groups: sudo
+    append: yes
+
+- name: Create sudoer file
+  copy:
+    dest: "/etc/sudoers.d/{{ common.default_user.username }}"
+    content: "{{ common.default_user.username }} ALL=(ALL) NOPASSWD:ALL"

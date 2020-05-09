@@ -1,0 +1,7 @@
+- hosts: master_node
+  name: Configure a master node
+  become: true
+  remote_user: ubuntu
+  roles:
+    - common
+    - docker

@@ -1,0 +1,4 @@
+common:
+  default_user:
+    username: chrisw
+    github_user: chrisw-devops

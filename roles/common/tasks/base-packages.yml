@@ -1,0 +1,45 @@
+---
+
+- name: Clear apt cache
+  apt:
+    autoclean: yes
+    autoremove: yes
+
+- name: Update all apt packages
+  apt:
+    name: "*"
+    state: latest
+    update_cache: yes
+    force_apt_get: yes
+
+- name: Install base networking packages
+  apt:
+    name: [
+      'chrony',
+      'curl',
+      'dnsutils',
+      'htop',
+      'netcat',
+      'net-tools',
+      'screen',
+      'telnet',
+      'traceroute',
+      'wget'
+    ]
+    force_apt_get: yes
+
+- name: Install utility packages
+  apt:
+    name: [
+      'logrotate',
+      'unzip',
+      'zip'
+    ]
+    force_apt_get: yes
+
+- name: Ensure base services are running and always start during a reboot
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items: ['chronyd', 'cron']
