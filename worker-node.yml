@@ -1,9 +1,9 @@
-- hosts: master_node
-  name: Configure a master node
+- hosts: worker_node
+  name: Configure a worker node
   become: true
   remote_user: ubuntu
   roles:
     - common
     - docker
     - kubernetes
-    - kubernetes-master
+    - kubernetes-worker

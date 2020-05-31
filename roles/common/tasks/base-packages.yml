@@ -12,6 +12,15 @@
     update_cache: yes
     force_apt_get: yes
 
+- name: Install packages to allow apt to communicate over https
+  apt:
+    name: [
+      'apt-transport-https',
+      'ca-certificates',
+      'software-properties-common'
+    ]
+    force_apt_get: true
+
 - name: Install base networking packages
   apt:
     name: [
@@ -34,6 +43,13 @@
       'logrotate',
       'unzip',
       'zip'
+    ]
+    force_apt_get: yes
+
+- name: Install python packages
+  apt:
+    name: [
+      'python3-pip'
     ]
     force_apt_get: yes
 
