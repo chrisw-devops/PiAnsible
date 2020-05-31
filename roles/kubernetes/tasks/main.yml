@@ -1,0 +1,44 @@
+---
+
+# For Kubelet to run, swap must be disabled
+- name: Stop swap from being enabled at boot
+  mount:
+    name: swap
+    fstype: swap
+    state: absent
+
+- name: Disable swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+
+- name: Add an the apt signing key for Kubernetes
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Add apt repo for Kubernetes
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: kubernetes
+
+- name: Install 1.18 of Kubernetes
+  apt:
+    name: [
+      'kubeadm=1.18.3-00',
+      'kubectl=1.18.3-00',
+      'kubelet=1.18.3-00'
+    ]
+    force_apt_get: true
+
+- name: Add a hold to prevent Kubernetes versions automatically updating
+  dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  with_items: [ 'kubeadm', 'kubectl', 'kubelet' ]
+
+- name: Ensure Kubelet service is running and always start during a reboot
+  systemd:
+    name: kubelet
+    state: started
+    enabled: yes

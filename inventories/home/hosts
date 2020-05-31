@@ -1,2 +1,5 @@
 [master_node]
 pi01.cwilliams.io hostname=pi01-cwilliams-io
+
+[worker_node]
+pi02.cwilliams.io hostname=pi02-cwilliams-io

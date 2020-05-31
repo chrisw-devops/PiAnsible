@@ -1,0 +1,35 @@
+---
+
+- name: Check kubeadm init has been run
+  stat:
+    path: "/etc/kubernetes/pki/ca.key"
+  register: kubeadm_init_completed
+
+- name: Initialise Kubernetes cluster
+  #Why this CIDR range you say? Read here: https://coreos.com/flannel/docs/latest/kubernetes.html
+  command: kubeadm init --pod-network-cidr=10.244.0.0/16
+  when: not kubeadm_init_completed.stat.exists
+
+- name: Create .kube diretories
+  file:
+    path: "/home/{{ item }}/.kube"
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: 0700
+    state: directory
+  with_items: [ ubuntu, "{{ common.default_user.username }}" ]
+
+- name: Create .kube config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "/home/{{ item }}/.kube/config"
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: 0700
+    remote_src: yes
+  with_items: [ ubuntu, "{{ common.default_user.username }}" ]
+
+- name: Add flannel as the CNI
+  become: yes
+  become_user: ubuntu
+  command: kubectl create -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
